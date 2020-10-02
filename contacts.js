@@ -1,62 +1,48 @@
 const fs = require("fs");
+const { promises: fsPromises } = fs;
 const path = require("path");
 const contactsPath = path.join(__dirname, "./db/contacts.json");
 
-function listContacts() {
-  fs.readFile(contactsPath, "utf-8", (err, data) => {
-    console.table(JSON.parse(data));
-  });
+const listContacts = () => fsPromises.readFile(contactsPath, "utf-8");
+
+const getContactById = async contactId =>
+  JSON.parse(await fsPromises.readFile(contactsPath, "utf-8")).find(el => el.id === contactId);
+
+async function removeContact(contactId) {
+  const data = await fsPromises.readFile(contactsPath, "utf-8");
+  const contactsObj = JSON.parse(data);
+  const withoutContactId = contactsObj.filter(el => el.id !== Number(contactId));
+
+  return contactsObj.length === withoutContactId.length
+    ? true
+    : await fsPromises.writeFile(contactsPath, JSON.stringify(withoutContactId));
 }
 
-function getContactById(contactId) {
-  fs.readFile(contactsPath, "utf-8", (err, data) => {
-    let contactsObj = JSON.parse(data);
-    let findEl = contactsObj.find(el => el.id === contactId);
-    console.table(findEl);
-  });
+async function addContact({ name, email, phone }) {
+  const data = await fsPromises.readFile(contactsPath, "utf-8");
+  const contactsObj = JSON.parse(data);
+  const newId = contactsObj.reduce((acc, el) => (el.id > acc ? el.id : acc), 0) + 1;
+  const newContact = { id: newId, name, email, phone };
+  contactsObj.push(newContact);
+  const newContactsJSON = JSON.stringify(contactsObj);
+
+  await fsPromises.writeFile(contactsPath, newContactsJSON);
+  return newContact;
 }
 
-function removeContact(contactId) {
-  fs.readFile(contactsPath, "utf-8", (err, data) => {
-    let contactsObj = JSON.parse(data);
-    let withoutContactId = contactsObj.filter(el => el.id !== contactId);
+async function updateContact(contactId, body) {
+  const data = await fsPromises.readFile(contactsPath, "utf-8");
+  const contactsObj = JSON.parse(data);
 
-    if (contactsObj.length === withoutContactId.length) {
-      console.log("NO contactId-" + contactId);
-      return;
+  for (let i = 0; i < contactsObj.length; i += 1) {
+    if (contactsObj[i].id === Number(contactId)) {
+      Object.keys(body).forEach(el => (contactsObj[i][el] = body[el]));
+      await fsPromises.writeFile(contactsPath, JSON.stringify(contactsObj));
+      return contactsObj[i];
     }
-    let newContactsJSON = JSON.stringify(withoutContactId);
+  }
 
-    fs.writeFile(contactsPath, newContactsJSON, err => {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      console.log("Contacts with id: " + contactId + " has been successfully removed!");
-      console.table(withoutContactId);
-    });
-  });
-}
-
-function addContact(name, email, phone) {
-  fs.readFile(contactsPath, "utf-8", (err, data) => {
-    let contactsObj = JSON.parse(data);
-    let newId = contactsObj.reduce((acc, el) => (el.id > acc ? el.id : acc), 0) + 1;
-
-    let newContact = { id: newId, name, email, phone };
-    contactsObj.push(newContact);
-
-    let newContactsJSON = JSON.stringify(contactsObj);
-
-    fs.writeFile(contactsPath, newContactsJSON, err => {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      console.log("Contact with id: " + newId + " has been successfully added!");
-      console.table(contactsObj);
-    });
-  });
+  return false;
 }
 
 module.exports = {
@@ -64,4 +50,5 @@ module.exports = {
   getContactById,
   removeContact,
   addContact,
+  updateContact,
 };
