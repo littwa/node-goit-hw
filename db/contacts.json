@@ -5,45 +5,21 @@
     "email": "nulla.ante@vestibul.co.uk",
     "phone": "(992) 914-3792"
   },
-<<<<<<< HEAD
   { "id": 2, "name": "Chaim Lewis", "email": "dui.in@egetlacus.ca", "phone": "(294) 840-6685" },
-  { "id": 4, "name": "Wylie Pope", "email": "est@utquamvel.net", "phone": "(692) 802-2949" },
-=======
-  {
-    "id": 2,
-    "name": "Chaim Lewis",
-    "email": "dui.in@egetlacus.ca",
-    "phone": "(294) 840-6685"
-  },
   {
     "id": 3,
     "name": "Kennedy Lane",
     "email": "mattis.Cras@nonenimMauris.net",
     "phone": "(542) 451-7038"
   },
-  {
-    "id": 4,
-    "name": "Wylie Pope",
-    "email": "est@utquamvel.net",
-    "phone": "(692) 802-2949"
-  },
->>>>>>> 1c44c6806ca5213d98b6fcc0c67da67ea1ed4a50
+  { "id": 4, "name": "Wylie Pope", "email": "est@utquamvel.net", "phone": "(692) 802-2949" },
   {
     "id": 5,
     "name": "Cyrus Jackson",
     "email": "nibh@semsempererat.com",
     "phone": "(501) 472-5218"
   },
-<<<<<<< HEAD
   { "id": 6, "name": "Abbot Franks", "email": "scelerisque@magnis.org", "phone": "(186) 568-3720" },
-=======
-  {
-    "id": 6,
-    "name": "Abbot Franks",
-    "email": "scelerisque@magnis.org",
-    "phone": "(186) 568-3720"
-  },
->>>>>>> 1c44c6806ca5213d98b6fcc0c67da67ea1ed4a50
   {
     "id": 7,
     "name": "Reuben Henry",
@@ -56,25 +32,7 @@
     "email": "dui.Fusce.diam@Donec.com",
     "phone": "(233) 738-2360"
   },
-<<<<<<< HEAD
   { "id": 9, "name": "Thomas Lucas", "email": "nec@Nulla.com", "phone": "(704) 398-7993" },
-=======
-  {
-    "id": 9,
-    "name": "Thomas Lucas",
-    "email": "nec@Nulla.com",
-    "phone": "(704) 398-7993"
-  },
->>>>>>> 1c44c6806ca5213d98b6fcc0c67da67ea1ed4a50
-  {
-    "id": 10,
-    "name": "Alec Howard",
-    "email": "Donec.elementum@scelerisquescelerisquedui.net",
-    "phone": "(748) 206-2688"
-<<<<<<< HEAD
-  },
-  { "id": 11, "name": "Mango", "email": "mango@gmail.com", "phone": "322-22-22" }
-=======
-  }
->>>>>>> 1c44c6806ca5213d98b6fcc0c67da67ea1ed4a50
+  { "id": 10, "name": "P", "email": "vgtrcd@bg.com", "phone": "776666510-099" },
+  { "id": 11, "name": "Kikki", "email": "asd@q.qq", "phone": "22201110-000" }
 ]
