@@ -1,35 +1,50 @@
 const express = require("express");
-const cors = require("cors");
 const morgan = require("morgan");
-const userRouter = require("./app/routers");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const userRouter = require("./app/contacts/routers");
 
-class UsServer {
+require("dotenv").config();
+
+class ContactsServer {
   constructor() {
-    this.app = null;
+    this.server = null;
   }
 
-  startServer() {
+  async startServer() {
     this.initServer();
-    this.initGlobalMiddlaware();
-    this.initRouters();
-    this.initPortListening();
+    this.initMiddleware();
+    this.initRoutes();
+    await this.initDatabase();
+    this.listenServer();
   }
-
   initServer() {
-    this.app = express();
+    this.server = express();
+  }
+  initMiddleware() {
+    this.server.use(morgan("combined"));
+    this.server.use(express.json());
+    this.server.use(cors());
+  }
+  initRoutes() {
+    this.server.use("/api", userRouter);
   }
 
-  initGlobalMiddlaware() {
-    this.app.use(express.json());
-    this.app.use(cors());
-    this.app.use(morgan("combined"));
+  async initDatabase() {
+    const option = { useUnifiedTopology: true, useNewUrlParser: true };
+    try {
+      await mongoose.connect(process.env.MONGO_URL, option);
+      console.log("Database connection successful");
+    } catch (err) {
+      console.log(`Server was closed with connect to db`);
+      process.exit(1);
+    }
   }
-  initRouters() {
-    this.app.use("/api", userRouter);
-  }
-  initPortListening() {
-    this.app.listen(3000, () => console.log("Started Port", 3000));
+
+  listenServer() {
+    this.server.listen(process.env.PORT, () =>
+      console.log("Success listen port:" + process.env.PORT),
+    );
   }
 }
-
-new UsServer().startServer();
+new ContactsServer().startServer();
