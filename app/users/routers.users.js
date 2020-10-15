@@ -10,4 +10,6 @@ userRouterAuth.post("/auth/logout", controllers.authorization, controllers.logou
 
 userRouterAuth.get("/users/current", controllers.authorization, controllers.getCurrentUser);
 
+userRouterAuth.patch("/users", controllers.authorization, controllers.patchSubscriptionUser);
+
 module.exports = userRouterAuth;

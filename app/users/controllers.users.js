@@ -38,7 +38,7 @@ class Controllers {
         {
           token,
         },
-        { new: true, useFindAndModify: false },
+        { new: true, useFindAndModify: false }
       );
 
       return res.status(200).send({
@@ -89,7 +89,7 @@ class Controllers {
         {
           token: "",
         },
-        { new: true, useFindAndModify: false },
+        { new: true, useFindAndModify: false }
       );
       if (!userWithoutToken) {
         return res.status(401).send({
@@ -110,13 +110,26 @@ class Controllers {
           message: "Not authorized",
         });
       }
-      return res
-        .status(200)
-        .send({ email: currentUser.email, subscription: currentUser.subscription });
+      return res.status(200).send({ email: currentUser.email, subscription: currentUser.subscription });
     } catch (err) {
       next(err.message);
     }
-  }; ////////////////////////////////////
+  };
+
+  patchSubscriptionUser = async (req, res, next) => {
+    try {
+      const updateUserSubscription = await modelUsers.findByIdAndUpdate(
+        req.user._id,
+        {
+          subscription: req.body.subscription,
+        },
+        { new: true, useFindAndModify: false }
+      );
+      return res.status(202).send({ email: updateUserSubscription.email, subscription: updateUserSubscription.subscription });
+    } catch (err) {
+      next(err.message);
+    }
+  };
 
   validRegisterUser = (req, res, next) => {
     const validSchema = Joi.object({
