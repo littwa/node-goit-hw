@@ -15,8 +15,6 @@ class Controllers {
     const storage = multer.diskStorage({
       destination: "tmp",
       filename: function (req, file, cb) {
-        // console.log("req: ", req);
-        // console.log("file: ", file);
         const ext = path.parse(file.originalname).ext;
         cb(null, Date.now() + ext);
       },
@@ -26,8 +24,10 @@ class Controllers {
   };
 
   imageMini = async (req, res, next) => {
+    if (!req.file) {
+      return next();
+    }
     try {
-      // console.log(111, req.file);
       const MINI_IMG = "public/images";
       await imagemin([`${req.file.destination}/*.{jpg,png}`], {
         destination: MINI_IMG,
@@ -41,7 +41,7 @@ class Controllers {
 
       const { filename, path: draftPath } = req.file;
 
-      // await fsPromises.unlink(draftPath);
+      await fsPromises.unlink(draftPath);
 
       req.file = {
         ...req.file,
@@ -57,10 +57,6 @@ class Controllers {
 
   registerUser = async (req, res, next) => {
     try {
-      // console.log("req.file: ", req.file);
-      // console.log("req.body: ", req.body);
-      // return res.status(201).send(req.file);
-      //=======================
       const { email, password } = req.body;
       const isExisted = await modelUsers.findOne({ email });
       if (isExisted) {
@@ -177,6 +173,49 @@ class Controllers {
     }
   };
 
+  updateUser = async (req, res, next) => {
+    try {
+      // console.log(1, req.body);
+      // console.log(2, req.file);
+
+      const { email, password } = req.body;
+      if (email) {
+        const isExisted = await modelUsers.findOne({ email });
+        if (isExisted) {
+          return res.status(409).send("Email in use");
+        }
+      }
+      if (password) {
+        const hashPass = await bcrypt.hash(password, 5);
+        req.body.password = hashPass;
+      }
+      if (req.file) {
+        let oldImg = req.user.avatarURL.replace("http://localhost:3000/images/", "");
+        // console.log(999, req.file.path);
+        await fsPromises.unlink("public/images/" + oldImg);
+        req.body.avatarURL = "http://localhost:3000/images/" + req.file.filename;
+      }
+
+      const userUpdated = await modelUsers.findByIdAndUpdate(
+        req.user._id,
+        {
+          ...req.body,
+        },
+        { new: true, useFindAndModify: false },
+      );
+
+      if (!userUpdated) {
+        return res.status(401).send({
+          message: "Not authorized",
+        });
+      }
+
+      res.status(200).send(userUpdated);
+    } catch (err) {
+      next(err);
+    }
+  };
+
   validRegisterUser = (req, res, next) => {
     const validSchema = Joi.object({
       email: Joi.string().required(),
@@ -196,6 +235,19 @@ class Controllers {
       password: Joi.string().required(),
     });
 
+    const { error } = validSchema.validate(req.body);
+    if (error) {
+      return res.status(400).send(error.message);
+    }
+    next();
+  };
+
+  validUpdateUser = (req, res, next) => {
+    const validSchema = Joi.object({
+      email: Joi.string(),
+      password: Joi.string(),
+      subscription: Joi.string(),
+    });
     const { error } = validSchema.validate(req.body);
     if (error) {
       return res.status(400).send(error.message);

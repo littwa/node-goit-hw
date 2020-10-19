@@ -17,4 +17,13 @@ userRouterAuth.post("/auth/logout", controllers.authorization, controllers.logou
 
 userRouterAuth.get("/users/current", controllers.authorization, controllers.getCurrentUser);
 
+userRouterAuth.patch(
+  "/users/avatars",
+  controllers.authorization,
+  controllers.multerMiddlware().single("avatar"),
+  controllers.validUpdateUser,
+  controllers.imageMini,
+  controllers.updateUser,
+);
+
 module.exports = userRouterAuth;
