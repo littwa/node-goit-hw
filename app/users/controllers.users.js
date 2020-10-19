@@ -3,16 +3,75 @@ const Joi = require("joi");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+const multer = require("multer");
+const path = require("path");
+const { promises: fsPromises } = require("fs");
+const imagemin = require("imagemin");
+const imageminJpegtran = require("imagemin-jpegtran");
+const imageminPngquant = require("imagemin-pngquant");
+
 class Controllers {
+  multerMiddlware = () => {
+    const storage = multer.diskStorage({
+      destination: "tmp",
+      filename: function (req, file, cb) {
+        // console.log("req: ", req);
+        // console.log("file: ", file);
+        const ext = path.parse(file.originalname).ext;
+        cb(null, Date.now() + ext);
+      },
+    });
+
+    return multer({ storage });
+  };
+
+  imageMini = async (req, res, next) => {
+    try {
+      // console.log(111, req.file);
+      const MINI_IMG = "public/images";
+      await imagemin([`${req.file.destination}/*.{jpg,png}`], {
+        destination: MINI_IMG,
+        plugins: [
+          imageminJpegtran(),
+          imageminPngquant({
+            quality: [0.6, 0.8],
+          }),
+        ],
+      });
+
+      const { filename, path: draftPath } = req.file;
+
+      // await fsPromises.unlink(draftPath);
+
+      req.file = {
+        ...req.file,
+        path: path.join(MINI_IMG, filename),
+        destination: MINI_IMG,
+      };
+
+      next();
+    } catch (err) {
+      next(err);
+    }
+  };
+
   registerUser = async (req, res, next) => {
     try {
+      // console.log("req.file: ", req.file);
+      // console.log("req.body: ", req.body);
+      // return res.status(201).send(req.file);
+      //=======================
       const { email, password } = req.body;
       const isExisted = await modelUsers.findOne({ email });
       if (isExisted) {
         return res.status(409).send("Email in use");
       }
       const hashPass = await bcrypt.hash(password, 5);
-      const user = await modelUsers.create({ ...req.body, password: hashPass });
+      const user = await modelUsers.create({
+        ...req.body,
+        password: hashPass,
+        avatarURL: "http://localhost:3000/images/" + req.file.filename,
+      });
       return res.status(201).send({ user: { email: user.email, subscription: user.subscription } });
     } catch (err) {
       next(err.message);
@@ -38,7 +97,7 @@ class Controllers {
         {
           token,
         },
-        { new: true, useFindAndModify: false }
+        { new: true, useFindAndModify: false },
       );
 
       return res.status(200).send({
@@ -89,7 +148,7 @@ class Controllers {
         {
           token: "",
         },
-        { new: true, useFindAndModify: false }
+        { new: true, useFindAndModify: false },
       );
       if (!userWithoutToken) {
         return res.status(401).send({
@@ -110,22 +169,9 @@ class Controllers {
           message: "Not authorized",
         });
       }
-      return res.status(200).send({ email: currentUser.email, subscription: currentUser.subscription });
-    } catch (err) {
-      next(err.message);
-    }
-  };
-
-  patchSubscriptionUser = async (req, res, next) => {
-    try {
-      const updateUserSubscription = await modelUsers.findByIdAndUpdate(
-        req.user._id,
-        {
-          subscription: req.body.subscription,
-        },
-        { new: true, useFindAndModify: false }
-      );
-      return res.status(202).send({ email: updateUserSubscription.email, subscription: updateUserSubscription.subscription });
+      return res
+        .status(200)
+        .send({ email: currentUser.email, subscription: currentUser.subscription });
     } catch (err) {
       next(err.message);
     }

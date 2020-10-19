@@ -25,6 +25,7 @@ class ContactsServer {
   initMiddleware() {
     this.server.use(morgan("combined"));
     this.server.use(express.json());
+    this.server.use(express.static("public"));
     this.server.use(cors());
   }
   initRoutes() {
@@ -48,4 +49,5 @@ class ContactsServer {
     );
   }
 }
+
 new ContactsServer().startServer();
