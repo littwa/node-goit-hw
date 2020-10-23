@@ -19,7 +19,9 @@
   },
   "homepage": "https://github.com/littwa/node-goit-hw#readme",
   "devDependencies": {
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "should": "^13.2.3",
+    "sinon": "^9.2.0"
   },
   "dependencies": {
     "bcrypt": "^5.0.0",

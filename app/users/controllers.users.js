@@ -11,6 +11,9 @@ const imageminJpegtran = require("imagemin-jpegtran");
 const imageminPngquant = require("imagemin-pngquant");
 
 class Controllers {
+  constructor() {
+    this.tokenTime = "72h";
+  }
   multerMiddlware = () => {
     const storage = multer.diskStorage({
       destination: "tmp",
@@ -85,7 +88,7 @@ class Controllers {
       }
 
       const token = await jwt.sign({ id: isExisted.id }, process.env.TOKEN_SECRET, {
-        expiresIn: "24h",
+        expiresIn: this.tokenTime,
       });
 
       const updatedUser = await modelUsers.findByIdAndUpdate(
