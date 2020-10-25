@@ -17,7 +17,7 @@ class ContactsServer {
     this.initMiddleware();
     this.initRoutes();
     await this.initDatabase();
-    this.listenServer();
+    return this.listenServer();
   }
   initServer() {
     this.server = express();
@@ -44,10 +44,12 @@ class ContactsServer {
   }
 
   listenServer() {
-    this.server.listen(process.env.PORT, () =>
+    return this.server.listen(process.env.PORT, () =>
       console.log("Success listen port:" + process.env.PORT),
     );
   }
 }
 
-new ContactsServer().startServer();
+module.exports = ContactsServer;
+
+// new ContactsServer().startServer();

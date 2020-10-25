@@ -116,11 +116,17 @@ class Controllers {
       const authoriz = req.get("Authorization") || "";
       const token = authoriz.slice(7);
 
+      if (!authoriz) {
+        return res.status(401).send({
+          message: "Not authorized",
+        });
+      }
+
       let userId;
       try {
-        userId = await jwt.verify(token, process.env.TOKEN_SECRET).id;
+        userId = (await jwt.verify(token, process.env.TOKEN_SECRET)).id;
       } catch (err) {
-        err.message = "Not authorized";
+        return res.status(401).send(err.message);
       }
 
       const user = await modelUsers.findById(userId);
@@ -178,9 +184,6 @@ class Controllers {
 
   updateUser = async (req, res, next) => {
     try {
-      // console.log(1, req.body);
-      // console.log(2, req.file);
-
       const { email, password } = req.body;
       if (email) {
         const isExisted = await modelUsers.findOne({ email });
@@ -194,7 +197,7 @@ class Controllers {
       }
       if (req.file) {
         let oldImg = req.user.avatarURL.replace("http://localhost:3000/images/", "");
-        // console.log(999, req.file.path);
+
         await fsPromises.unlink("public/images/" + oldImg);
         req.body.avatarURL = "http://localhost:3000/images/" + req.file.filename;
       }
