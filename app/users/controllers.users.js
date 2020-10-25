@@ -65,7 +65,11 @@ class Controllers {
       if (isExisted) {
         return res.status(409).send("Email in use");
       }
+      if (!req.file) {
+        req.file = { filename: "default-ava.png" };
+      }
       const hashPass = await bcrypt.hash(password, 5);
+      console.log(req.file.filename);
       const user = await modelUsers.create({
         ...req.body,
         password: hashPass,

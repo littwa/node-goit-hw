@@ -52,4 +52,4 @@ class ContactsServer {
 
 module.exports = ContactsServer;
 
-// new ContactsServer().startServer();
+new ContactsServer().startServer();
