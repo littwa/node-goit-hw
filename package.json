@@ -4,8 +4,9 @@
   "description": "goit-hw-01-node-basics",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
+    "test": "mocha app/test/accept.spec.js",
+    "start": "nodemon app/start.server.js",
+    "testunit": "mocha app/test/unit.spec.js",
     "dev": "nodemon index.js"
   },
   "repository": {

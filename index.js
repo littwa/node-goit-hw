@@ -7,7 +7,7 @@ const userRouterAuth = require("./app/users/routers.users");
 
 require("dotenv").config();
 
-class ContactsServer {
+module.exports = class ContactsServer {
   constructor() {
     this.server = null;
   }
@@ -48,8 +48,8 @@ class ContactsServer {
       console.log("Success listen port:" + process.env.PORT),
     );
   }
-}
+};
 
-module.exports = ContactsServer;
+// module.exports = ContactsServer;
 
-new ContactsServer().startServer();
+// new ContactsServer().startServer();
