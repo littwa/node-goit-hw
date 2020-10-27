@@ -4,9 +4,7 @@ const request = require("supertest");
 const { requests } = require("sinon");
 const userModel = require("../users/model.users");
 const { promises: fsPromises } = require("fs");
-
-console.log(1, ContactsServer);
-// console.log(1, ContactsServer)
+require("dotenv").config();
 
 describe("Acceptance tests suitcase example", () => {
   let server;
@@ -40,10 +38,7 @@ describe("Acceptance tests suitcase example", () => {
     it("should return 200, body-perfect and avatarUrl", async () => {
       await request(server)
         .patch("/api/users/avatars")
-        .auth(
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVmOTcyZDM5OGU3MDJjMjk2MDkzNDJlNSIsImlhdCI6MTYwMzc0MzA4NywiZXhwIjoxNjA0MDAyMjg3fQ.ugNKpPLpw8AEgn0cc-Ai3uJLenkznaUT0ITOXAa-4hA",
-          { type: "bearer" },
-        )
+        .auth(process.env.TEST_TOKEN, { type: "bearer" })
         .attach("avatar", "public/images/default-ava.png")
         .field("subscription", "pro")
         .expect(function (res) {
