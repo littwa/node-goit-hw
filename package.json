@@ -1,11 +1,12 @@
 {
-  "name": "01-node-basics",
+  "name": "06-email",
   "version": "1.0.0",
-  "description": "goit-hw-01-node-basics",
+  "description": "goit-hw-06-email",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
+    "test": "mocha app/test/accept.spec.js",
+    "start": "nodemon app/start.server.js",
+    "testunit": "mocha app/test/unit.spec.js",
     "dev": "nodemon index.js"
   },
   "repository": {
@@ -19,19 +20,29 @@
   },
   "homepage": "https://github.com/littwa/node-goit-hw#readme",
   "devDependencies": {
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "should": "^13.2.3",
+    "sinon": "^9.2.0",
+    "supertest": "^5.0.0"
   },
   "dependencies": {
+    "avatar-builder": "^1.0.1",
     "bcrypt": "^5.0.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "imagemin": "^7.0.1",
+    "imagemin-jpegtran": "^7.0.0",
+    "imagemin-pngquant": "^9.0.1",
     "joi": "^17.2.1",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.6.2",
     "mongoose": "^5.10.8",
     "mongoose-paginate-v2": "^1.3.9",
     "morgan": "^1.10.0",
-    "yargs": "^16.0.3"
+    "multer": "^1.4.2",
+    "yargs": "^16.0.3",
+    "@sendgrid/mail": "^7.3.0",
+    "uuid": "^8.3.1"
   }
 }
