@@ -12,7 +12,6 @@ const imageminJpegtran = require("imagemin-jpegtran");
 const imageminPngquant = require("imagemin-pngquant");
 
 const Avatar = require("avatar-builder");
-const avatar = Avatar.squareBuilder(128);
 
 class Controllers {
   constructor() {
@@ -32,6 +31,12 @@ class Controllers {
 
   avatarGenerate = async (req, res, next) => {
     if (!req.file) {
+      const randomColor = "#" + (((1 << 24) * Math.random()) | 0).toString(16);
+      const randomNum = Math.floor(Math.random() * (12 - 3)) + 3;
+      const avatar = Avatar.squareBuilder(128, randomNum, [randomColor, "#ffffff"], {
+        cache: null,
+      });
+
       const buffer = await avatar.create("gabriel");
       const filename = Date.now() + ".png";
       const destination = "tmp";
@@ -46,7 +51,6 @@ class Controllers {
       return next();
     }
     try {
-      console.log(3, req.file.destination, 3);
       const MINI_IMG = "public/images";
       await imagemin([`${req.file.destination}/*.{jpg,png}`], {
         destination: MINI_IMG,
@@ -59,10 +63,9 @@ class Controllers {
       });
 
       const { filename, path: draftPath } = req.file;
-      console.log(5, draftPath);
 
       await fsPromises.unlink(draftPath);
-      console.log(1212, MINI_IMG, filename);
+
       req.file = {
         ...req.file,
         path: path.join(MINI_IMG, filename),
@@ -82,18 +85,7 @@ class Controllers {
       if (isExisted) {
         return res.status(409).send("Email in use");
       }
-      // console.log(req.file);
-      // if (!req.file) {
-      //   // req.file = { filename: "default-ava.png" };
-      //   console.log(1, fs);
-      //   console.log(2, fsPromises);
-      //   avatar.create("gabriel").then(buffer => fs.writeFileSync("tmp/avatar-gabriel.png", buffer));
-      //   // const buffer = await avatar.create("gabriel");
-      //   // console.log(1, buffer);
-      //   // const ff = fsPromises.writeFileSync("public/images/avatar-gabriel.png", buffer);
-      //   // console.log(2, ff);
-      // }
-      console.log(req.file.filename);
+
       const hashPass = await bcrypt.hash(password, 5);
 
       const user = await modelUsers.create({
