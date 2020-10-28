@@ -6,6 +6,7 @@ userRouter.post(
   "/auth/register",
   controllers.multerMiddlware().single("avatar"),
   controllers.validRegisterUser,
+  controllers.avatarGenerate,
   controllers.imageMini,
   controllers.registerUser,
 );
