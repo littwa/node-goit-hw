@@ -1,15 +1,29 @@
 const express = require("express");
-const userRouterAuth = express.Router();
+const userRouter = express.Router();
 const controllers = require("./controllers.users");
 
-userRouterAuth.post("/auth/register", controllers.validRegisterUser, controllers.registerUser);
+userRouter.post(
+  "/auth/register",
+  controllers.multerMiddlware().single("avatar"),
+  controllers.validRegisterUser,
+  controllers.avatarGenerate,
+  controllers.imageMini,
+  controllers.registerUser,
+);
 
-userRouterAuth.post("/auth/login", controllers.validLoginUser, controllers.loginUser);
+userRouter.post("/auth/login", controllers.validLoginUser, controllers.loginUser);
 
-userRouterAuth.post("/auth/logout", controllers.authorization, controllers.logoutUser);
+userRouter.post("/auth/logout", controllers.authorization, controllers.logoutUser);
 
-userRouterAuth.get("/users/current", controllers.authorization, controllers.getCurrentUser);
+userRouter.get("/users/current", controllers.authorization, controllers.getCurrentUser);
 
-userRouterAuth.patch("/users", controllers.authorization, controllers.patchSubscriptionUser);
+userRouter.patch(
+  "/users/avatars",
+  controllers.authorization,
+  controllers.multerMiddlware().single("avatar"),
+  controllers.validUpdateUser,
+  controllers.imageMini,
+  controllers.updateUser,
+);
 
-module.exports = userRouterAuth;
+module.exports = userRouter;
