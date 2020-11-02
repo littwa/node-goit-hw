@@ -27,4 +27,5 @@ userRouter.patch(
 );
 userRouter.get("/auth/verify/:token", controllers.verificationUser);
 
+
 module.exports = userRouter;
