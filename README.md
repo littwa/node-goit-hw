@@ -1,3 +1,4 @@
 # node-goit-hw
 
-Node.js | Home Work(current#05).
+Node.js | Home Work(current#06).
+

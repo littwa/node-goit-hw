@@ -10,8 +10,10 @@ const fs = require("fs");
 const imagemin = require("imagemin");
 const imageminJpegtran = require("imagemin-jpegtran");
 const imageminPngquant = require("imagemin-pngquant");
-
 const Avatar = require("avatar-builder");
+
+const uuid = require("uuid");
+const sgMail = require("@sendgrid/mail");
 
 class Controllers {
   constructor() {
@@ -33,6 +35,7 @@ class Controllers {
     if (!req.file) {
       const randomColor = "#" + (((1 << 24) * Math.random()) | 0).toString(16);
       const randomNum = Math.floor(Math.random() * (12 - 3)) + 3;
+
       const avatar = Avatar.squareBuilder(128, randomNum, [randomColor, "#ffffff"], {
         cache: null,
       });
@@ -93,6 +96,7 @@ class Controllers {
         password: hashPass,
         avatarURL: "http://localhost:3000/images/" + req.file.filename,
       });
+      this.createAndSendVerifyToken(user._id, user.email);
       return res.status(201).send({ user: { email: user.email, subscription: user.subscription } });
     } catch (err) {
       next(err.message);
@@ -281,6 +285,56 @@ class Controllers {
       return res.status(400).send(error.message);
     }
     next();
+  };
+
+  createAndSendVerifyToken = async (userId, userEmail) => {
+    try {
+      const verificationToken = uuid.v4();
+
+      await modelUsers.findByIdAndUpdate(
+        userId,
+        { verificationToken },
+        { new: true, useFindAndModify: false },
+      );
+
+      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+      const msg = {
+        to: userEmail,
+        from: process.env.SENDGRID_VERIFIED_SENDER,
+        subject: "Email verification",
+        text: "Verification!",
+        html: `<a href='http://localhost:3000/api/auth/verify/${verificationToken}'>Click here for verification!</a>`,
+      };
+
+      const resultSendEmail = await sgMail.send(msg);
+    } catch (err) {
+      next(err.message);
+    }
+  };
+
+  verificationUser = async (req, res, next) => {
+    try {
+      const { token: verificationToken } = req.params;
+
+      const isUserForVerify = await modelUsers.findOne({ verificationToken });
+      if (!isUserForVerify) {
+        throw new Error("404 User not found");
+      }
+
+      await modelUsers.findByIdAndUpdate(
+        isUserForVerify._id,
+        {
+          status: "Verified",
+          verificationToken: "",
+        },
+        { new: true, useFindAndModify: false },
+      );
+
+      return res.status(200).send("User successfully verified!!!");
+    } catch (err) {
+      next(err.message);
+    }
   };
 }
 
